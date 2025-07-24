@@ -5,7 +5,7 @@ import axios from 'axios';
 import FeedbackList from './components/FeedbackList';
 
 
-const BASE_URL = import.meta.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/feedback';
+const BASE_URL = import.meta.env.REACT_APP_API_BASE_URL || 'https://feedback-backend-avga.onrender.com/feedback';
 
 function App() {
 
