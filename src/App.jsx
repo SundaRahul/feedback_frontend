@@ -1,33 +1,40 @@
-import React, { useEffect, useState } from 'react'
-import Header from './components/Header'
-import FeedbackForm from './components/FeedbackForm'
-import axios from 'axios';
+
+import React, { useEffect, useState } from 'react';
+import Header from './components/Header';
+import FeedbackForm from './components/FeedbackForm';
 import FeedbackList from './components/FeedbackList';
+import axios from 'axios';
 
 
-const BASE_URL = import.meta.env.REACT_APP_API_BASE_URL || 'https://feedback-backend-avga.onrender.com/feedback';
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://feedback-backend-avga.onrender.com/feedback';
 
 function App() {
-
   const [feedback, setFeedback] = useState([]);
 
   const addFeedback = async (formData) => {
-    await axios.post(`${BASE_URL}`, formData);
-  }
+    try {
+      const res = await axios.post(BASE_URL, formData);
+      setFeedback((prev) => [...prev, res.data]);
+    } catch (error) {
+      console.error('Error adding feedback:', error);
+    }
+  };
 
+  
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}`);
+        const res = await axios.get(BASE_URL);
         setFeedback(res.data);
       } catch (error) {
-        console.error("Error Fetching data", error);
+        console.error('Error fetching feedback:', error);
       }
     };
+
     fetchFeedback();
-  }, [addFeedback])
+  }, []);
 
-
+  
   const deleteFeedback = async (id) => {
     try {
       await axios.delete(`${BASE_URL}/${id}`);
@@ -36,27 +43,32 @@ function App() {
       console.error('Error deleting feedback:', error);
     }
   };
+
+
   const handleVote = async (id, direction) => {
     try {
-      console.log(id)
-      console.log(direction)
       const res = await axios.put(`${BASE_URL}/${id}/vote`, { direction });
       setFeedback((prev) =>
         prev.map((item) => (item.id === id ? res.data : item))
       );
-
     } catch (error) {
       console.error('Error voting on feedback:', error);
     }
   };
+
   return (
-    <div>
-      <Header></Header>
-      <FeedbackForm onAdd={addFeedback}></FeedbackForm>
-      <FeedbackList feedback={feedback} onDelete={deleteFeedback}
-        onVote={handleVote} />
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="max-w-2xl mx-auto p-4">
+        <FeedbackForm onAdd={addFeedback} />
+        <FeedbackList
+          feedback={feedback}
+          onDelete={deleteFeedback}
+          onVote={handleVote}
+        />
+      </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
